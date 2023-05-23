@@ -1,4 +1,8 @@
 mimics_*
 MIMICS-*
 MIMICS
+
 data/*
+data/*.py
+data/*.ipynb
+
