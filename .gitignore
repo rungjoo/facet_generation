@@ -3,6 +3,6 @@ MIMICS-*
 MIMICS
 
 data/*
-data/*.py
-data/*.ipynb
+!data/*.py
+!data/*.ipynb
 
