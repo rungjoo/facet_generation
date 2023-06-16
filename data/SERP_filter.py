@@ -28,7 +28,14 @@ for file_path in file_list:
             snippet_list = [x['snippet'] for x in json_data['webPages']['value']]
         except:
             snippet_list = []
-        query_data[query] = snippet_list
+            
+        try:
+            related_list = [x['text'] for x in json_data['relatedSearches']['value']]
+        except:
+            related_list = []
+        query_data[query] = {}
+        query_data[query]['snippet_list'] = snippet_list
+        query_data[query]['related_list'] = related_list        
         
         with open("MIMICS-BingAPI.jsonl", "a", encoding="utf-8") as f:
             json.dump(query_data, f)

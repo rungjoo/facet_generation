@@ -6,19 +6,28 @@ with jsonlines.open("MIMICS-BingAPI.jsonl") as f:
     for line in f.iter():
         dataset.append(line)
         
+import re
+def cleanhtml(raw_html):
+    cleanr = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return cleantext
+
 query_document = {}
 for data in dataset:
     query = list(data.keys())[0]
-    snippet_list = data[query]
-    query_document[query] = snippet_list
+    snippet_list = data[query]['snippet_list']
+    related_list = data[query]['related_list']
+    query_document[query] = {}
+    query_document[query]['snippet_list'] = [cleanhtml(x) for x in snippet_list]
+    query_document[query]['related_list'] = related_list
     
 """ MIMICS loading """    
 import glob
 print("MIMICS loading")
 folder = "../MIMICS/data/*"
 datapath_list = glob.glob(folder)
-train_path = datapath_list[0]
-test_path = datapath_list[1]
+train_path = datapath_list[0] # MIMICS-Click.tsv
+test_path = datapath_list[1] # MIMICS-Manual.tsv
 
 import pandas as pd
 tr_df = pd.read_csv(train_path, sep = '\t')
@@ -43,7 +52,8 @@ for i in range(len(train_dataset)):
             filter_options.append(option)    
     train_data[i]['facet'] = filter_options
     if query in query_document:
-        train_data[i]['document'] = query_document[query]
+        train_data[i]['document'] = query_document[query]['snippet_list']
+        train_data[i]['related'] = query_document[query]['related_list']
     
 test_data = {}
 for i in range(len(test_dataset)):
@@ -61,7 +71,8 @@ for i in range(len(test_dataset)):
     options_overall_label = int(data['options_overall_label']) # Manual
     test_data[i]['options_overall_label'] = options_overall_label
     if query in query_document:
-        test_data[i]['document'] = query_document[query]
+        test_data[i]['document'] = query_document[query]['snippet_list']
+        test_data[i]['related'] = query_document[query]['related_list']
         
 import json
 with open("train.json", 'w', encoding='utf-8') as f:
