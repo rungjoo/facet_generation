@@ -1,4 +1,0 @@
-mimics_*
-MIMICS-*
-MIMICS/*
-data/*
