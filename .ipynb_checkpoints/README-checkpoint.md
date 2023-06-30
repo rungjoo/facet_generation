@@ -19,7 +19,7 @@ python3 SERP_filter.py
 ```
 
 ## data/data_preprocess.py
-Create train.json and test.json
+Create train.json and test.json in data folder
 ```
 python3 data_preprocess.py
 ```

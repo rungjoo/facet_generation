@@ -14,6 +14,7 @@ def main():
     for ind, data in tqdm(test_data.items()):
         query = data['query']
         label = data['facet']
+        options_overall_label = data['options_overall_label']
         try:
             documents = data['document']
             pred_facets = facet_extractor.extract_facets(query, 
@@ -30,6 +31,7 @@ def main():
         round_robin_result[ind]['query'] = query
         round_robin_result[ind]['pred'] = pred_facets
         round_robin_result[ind]['label'] = label
+        round_robin_result[ind]['options_overall_label'] = options_overall_label        
 
 
     with open(f"../result/ictir_{model_type}.json", "w") as f:

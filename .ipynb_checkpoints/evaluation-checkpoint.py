@@ -8,7 +8,7 @@ from evaluate import load
 bertscore_func = load("bertscore")
 from nltk.translate.bleu_score import sentence_bleu
 
-def best_bleu_cand(groundtruth, candidate):
+def best_bleu_cand_ori(groundtruth, candidate):
     # assert len(groundtruth) >= len(candidate)
     all_permutations = list(itertools.permutations(candidate))
     max_bleu = 0.
@@ -22,6 +22,21 @@ def best_bleu_cand(groundtruth, candidate):
             best_cand = cand
     return list(best_cand)
 
+def best_bleu_cand(groundtruth, candidate):
+    copy_candidate = candidate[:]
+    best_cand = []
+    for facet in groundtruth:
+        max_bleu = 0
+        max_ind = 0
+        for i in range(len(copy_candidate)):
+            bleu = sentence_bleu([facet], copy_candidate[i])
+            if bleu > max_bleu:
+                max_bleu = bleu
+                max_ind = i
+        if len(copy_candidate) > 0:
+            best_cand.append(copy_candidate[max_ind])
+            copy_candidate.pop(max_ind)
+    return best_cand+copy_candidate
 
 def eval_bleu(groundtruth, cand):
     # Calculates the SET BLEU metrics, for 1-gram, 2-gram, 3-gram and 4-gram overlaps
@@ -83,6 +98,8 @@ def term_match(groundtruth, cand):
     f1 = 2 * p * r / (p + r) if p + r > 0 else 0.
     return [p, r, f1]
 
+def cal_mean(result_list):
+    return sum(result_list)/len(result_list)
 
 def main():
     model_type = args.model_type
@@ -92,12 +109,10 @@ def main():
     elif model_type == 'gpt3':
         result_path = "result/gpt3_facets.json"
         save_path = "result_gpt3.txt"
-    elif model_type == "round_robin":
-        result_path = "result/ictir_round_robin.json"
-        save_path = "result_round_robin.txt"
-    elif model_type == "abstractive":
-        result_path = "result/ictir_abstractive.json"
-        save_path = "abstractive.txt"
+    else: ## ictir
+        result_path = f"result/ictir_{model_type}.json"
+        save_path = f"result_{model_type}.txt"
+        
         
     with open(result_path, 'r', encoding='utf-8') as f:
         result = json.load(f)
@@ -105,12 +120,19 @@ def main():
     exact_p_list, exact_r_list, exact_f1_list = [], [], []
     term_p_list, term_r_list, term_f1_list = [], [], []
     bleu_list1, bleu_list2, bleu_list3, bleu_list4 = [], [], [], []
-    bert_p_list, bert_r_list, bert_f1_list = [], [], []    
+    bert_p_list, bert_r_list, bert_f1_list = [], [], []
+    
+    filter_exact_p_list, filter_exact_r_list, filter_exact_f1_list = [], [], []
+    filter_term_p_list, filter_term_r_list, filter_term_f1_list = [], [], []
+    filter_bleu_list1, filter_bleu_list2, filter_bleu_list3, filter_bleu_list4 = [], [], [], []
+    filter_bert_p_list, filter_bert_r_list, filter_bert_f1_list = [], [], []    
     for k, data in tqdm(result.items()):
-        pred_list = data['pred']
+        pred_list = data['pred']        
         label_list = data['label']
+        options_overall_label = data['options_overall_label']
         
-        pred_list = best_bleu_cand(label_list, pred_list)
+        pred_list = pred_list[:5]
+        pred_list = best_bleu_cand_ori(label_list, pred_list)
 
         exact_p, exact_r, exact_f1 = exact_match(label_list, pred_list)
         exact_p_list.append(exact_p)
@@ -128,29 +150,46 @@ def main():
         bleu_list3.append(bleu3)
         bleu_list4.append(bleu4)
         
-        bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list)
+        if len(pred_list) == 0:
+            bert_p, bert_r, bert_f1 = 0, 0, 0
+        else:
+            bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list)
         bert_p_list.append(bert_p)
         bert_r_list.append(bert_r)
         bert_f1_list.append(bert_f1)
+        
+        if options_overall_label >= 1:
+            filter_exact_p_list.append(exact_p)
+            filter_exact_r_list.append(exact_r)
+            filter_exact_f1_list.append(exact_f1)
+            
+            filter_term_p_list.append(term_p)
+            filter_term_r_list.append(term_r)
+            filter_term_f1_list.append(term_f1)
+            
+            filter_bleu_list1.append(bleu1)
+            filter_bleu_list2.append(bleu2)
+            filter_bleu_list3.append(bleu3)
+            filter_bleu_list4.append(bleu4)
+            
+            filter_bert_p_list.append(bert_p)
+            filter_bert_r_list.append(bert_r)
+            filter_bert_f1_list.append(bert_f1)            
 
-    exact_p_score = sum(exact_p_list)/len(exact_p_list)
-    exact_r_score = sum(exact_r_list)/len(exact_r_list)
-    exact_f1_score = sum(exact_f1_list)/len(exact_f1_list)
+    exact_p_score, exact_r_score, exact_f1_score = cal_mean(exact_p_list), cal_mean(exact_r_list), cal_mean(exact_f1_list)
+    filter_exact_p_score, filter_exact_r_score, filter_exact_f1_score = cal_mean(filter_exact_p_list), cal_mean(filter_exact_r_list), cal_mean(filter_exact_f1_list)
 
-    term_p_score = sum(term_p_list)/len(term_p_list)
-    term_r_score = sum(term_r_list)/len(term_r_list)
-    term_f1_score = sum(term_f1_list)/len(term_f1_list)
+    term_p_score, term_r_score, term_f1_score = cal_mean(term_p_list), cal_mean(term_r_list), cal_mean(term_f1_list)
+    filter_term_p_score, filter_term_r_score, filter_term_f1_score = cal_mean(filter_term_p_list), cal_mean(filter_term_r_list), cal_mean(filter_term_f1_list)
     
-    bleu_s1 = sum(bleu_list1)/len(bleu_list1)
-    bleu_s2 = sum(bleu_list2)/len(bleu_list2)
-    bleu_s3 = sum(bleu_list3)/len(bleu_list3)
-    bleu_s4 = sum(bleu_list4)/len(bleu_list4)
+    bleu_s1, bleu_s2, bleu_s3, bleu_s4 = cal_mean(bleu_list1), cal_mean(bleu_list2), cal_mean(bleu_list3), cal_mean(bleu_list4)
+    filter_bleu_s1, filter_bleu_s2, filter_bleu_s3, filter_bleu_s4 =\
+        cal_mean(filter_bleu_list1), cal_mean(filter_bleu_list2), cal_mean(filter_bleu_list3), cal_mean(filter_bleu_list4)
     
-    bert_p_score = sum(bert_p_list)/len(bert_p_list)
-    bert_r_score = sum(bert_r_list)/len(bert_r_list)
-    bert_f1_score = sum(bert_f1_list)/len(bert_f1_list)
+    bert_p_score, bert_r_score, bert_f1_score = cal_mean(bert_p_list), cal_mean(bert_r_list), cal_mean(bert_f1_list)
+    filter_bert_p_score, filter_bert_r_score, filter_bert_f1_score = cal_mean(filter_bert_p_list), cal_mean(filter_bert_r_list), cal_mean(filter_bert_f1_list)
     
-    with open(f"result/{save_path}" ,"w") as f:
+    with open(f"result/{save_path}" ,"a") as f:
         f.write("Term-overlapping\n")
         f.write(f"precision: {term_p_score}, recall: {term_r_score}, f1: {term_f1_score}\n")
         f.write("Exact-matching\n")
@@ -158,7 +197,17 @@ def main():
         f.write("Blue-score\n")
         f.write(f"bleu1: {bleu_s1}, bleu2: {bleu_s2}, bleu3: {bleu_s3}, bleu4: {bleu_s4}\n")
         f.write("BERTScore\n")
-        f.write(f"precision: {bert_p_score}, recall: {bert_r_score}, f1: {bert_f1_score}\n")
+        f.write(f"precision: {bert_p_score}, recall: {bert_r_score}, f1: {bert_f1_score}\n\n")
+        
+        f.write("Filter Result - options_overall_label >= 1\n")
+        f.write("Term-overlapping\n")
+        f.write(f"precision: {filter_term_p_score}, recall: {filter_term_r_score}, f1: {filter_term_f1_score}\n")
+        f.write("Exact-matching\n")
+        f.write(f"precision: {filter_exact_p_score}, recall: {filter_exact_r_score}, f1: {filter_exact_f1_score}\n")
+        f.write("Blue-score\n")
+        f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n")
+        f.write("BERTScore\n")
+        f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n")
     
 if __name__ == '__main__':
     """Parameters"""

@@ -24,6 +24,7 @@ def main():
     test_result = {}
     for k, data in tqdm(test_data.items()):
         query = data['query']
+        options_overall_label = data['options_overall_label']
         gt_facet_list = data['facet']
 
         inputs = tokenizer(query, padding=True, truncation=True, max_length=tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)
@@ -37,6 +38,7 @@ def main():
         test_result[k]['query'] = query
         test_result[k]['pred'] = [x for x in pred_facet_list if x.strip() != ""]
         test_result[k]['label'] = gt_facet_list
+        test_result[k]['options_overall_label'] = options_overall_label        
 
     with open(save_path, "w", encoding='utf-8') as f:
         json.dump(test_result, f)
