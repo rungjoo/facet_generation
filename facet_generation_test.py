@@ -30,7 +30,7 @@ def main():
         inputs = tokenizer(query, padding=True, truncation=True, max_length=tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)
         inputs.to(device)    
 
-        token_ids = model.generate(inputs["input_ids"])
+        token_ids = model.generate(inputs["input_ids"], max_length=tokenizer.model_max_length)
         pred_facet_string = tokenizer.decode(token_ids[0], skip_special_tokens=True)
         pred_facet_list = [x.strip() for x in pred_facet_string.split(",")]
 

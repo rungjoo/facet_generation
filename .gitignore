@@ -1,6 +1,15 @@
 MIMICS
+Faspect
+
+*.json
+*.txt
+*nohup*
+*.log
+
+!result/*
 
 data/*
 !data/*.py
 !data/*.ipynb
+!data/merge_test.json
 

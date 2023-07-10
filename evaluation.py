@@ -129,8 +129,9 @@ def main():
     for k, data in tqdm(result.items()):
         pred_list = data['pred']        
         label_list = data['label']
-        options_overall_label = data['options_overall_label']
+        options_overall_label = data['options_overall_label']    
         
+        ## 최대 5개가 후보이므로
         pred_list = pred_list[:5]
         pred_list = best_bleu_cand_ori(label_list, pred_list)
 
@@ -143,6 +144,7 @@ def main():
         term_p_list.append(term_p)
         term_r_list.append(term_r)
         term_f1_list.append(term_f1)
+        
         
         bleu1, bleu2, bleu3, bleu4 = eval_bleu(label_list, pred_list)
         bleu_list1.append(bleu1)
