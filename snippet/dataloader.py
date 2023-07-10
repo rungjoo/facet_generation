@@ -42,7 +42,7 @@ class data_loader(Dataset):
             batch_enc.append(input_string)
                         
             document = data['document']
-            taget_string = ", ".join(document).strip()
+            taget_string = "|".join(document).strip()
             batch_dec.append(taget_string)
             
         enc_inputs = self.tokenizer(batch_enc, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)

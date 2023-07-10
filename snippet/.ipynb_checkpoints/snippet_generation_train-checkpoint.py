@@ -99,7 +99,7 @@ if __name__ == '__main__':
     torch.cuda.empty_cache()
     
     """Parameters"""
-    parser  = argparse.ArgumentParser(description = "block ranking system" )
+    parser  = argparse.ArgumentParser(description = "snippet" )
     parser.add_argument( "--batch", type=int, help = "batch_size", default = 1)
     parser.add_argument( "--epoch", type=int, help = 'training epohcs', default = 10)
     parser.add_argument( "--norm", type=int, help = "max_grad_norm", default = 10)
