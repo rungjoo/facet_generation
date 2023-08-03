@@ -1,0 +1,1 @@
+python3 snippet_generation_train.py --epoch 5 --batch 4

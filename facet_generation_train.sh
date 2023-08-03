@@ -1,1 +1,0 @@
-python3 train.py --batch 4 --epoch 10

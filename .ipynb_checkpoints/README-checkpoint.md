@@ -24,10 +24,28 @@ Create train.json and test.json in data folder
 python3 data_preprocess.py
 ```
 
-# Train
+## document
+Generate document from query
+
+## related
+Generate document from query
+
+# Model Train
+
+## baseline
+- input: query
+- output: facet
 ```
 python3 facet_generation_train.py --model_type {type}
 ```
+
+## query_documet
+- input: query+documet
+- output: facet
+
+## query_related
+- input: query+related
+- output: facet
 
 # Test
 All reulsts are included in result folder

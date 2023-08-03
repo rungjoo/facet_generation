@@ -103,16 +103,13 @@ def cal_mean(result_list):
 
 def main():
     model_type = args.model_type
-    if model_type == 'baseline':
-        result_path = "result/baseline.json"
-        save_path = "result_baseline.txt"
-    elif model_type == 'gpt3':
+    test_type = args.test_type
+    if model_type == 'gpt3':
         result_path = "result/gpt3_facets.json"
-        save_path = "result_gpt3.txt"
+        save_path = "result_gpt3.txt"    
     else: ## ictir
-        result_path = f"result/ictir_{model_type}.json"
-        save_path = f"result_{model_type}.txt"
-        
+        result_path = f"result/{model_type}.json"
+        save_path = f"result_{model_type}.txt"        
         
     with open(result_path, 'r', encoding='utf-8') as f:
         result = json.load(f)
@@ -125,8 +122,19 @@ def main():
     filter_exact_p_list, filter_exact_r_list, filter_exact_f1_list = [], [], []
     filter_term_p_list, filter_term_r_list, filter_term_f1_list = [], [], []
     filter_bleu_list1, filter_bleu_list2, filter_bleu_list3, filter_bleu_list4 = [], [], [], []
-    filter_bert_p_list, filter_bert_r_list, filter_bert_f1_list = [], [], []    
+    filter_bert_p_list, filter_bert_r_list, filter_bert_f1_list = [], [], []
+    
+    test_query_set = set()
     for k, data in tqdm(result.items()):
+        query = data['query']
+        if test_type == "duplicate":
+            pass
+        else:
+            if query in test_query_set:
+                continue
+            else:
+                test_query_set.add(query)
+        
         pred_list = data['pred']        
         label_list = data['label']
         options_overall_label = data['options_overall_label']    
@@ -191,7 +199,8 @@ def main():
     bert_p_score, bert_r_score, bert_f1_score = cal_mean(bert_p_list), cal_mean(bert_r_list), cal_mean(bert_f1_list)
     filter_bert_p_score, filter_bert_r_score, filter_bert_f1_score = cal_mean(filter_bert_p_list), cal_mean(filter_bert_r_list), cal_mean(filter_bert_f1_list)
     
-    with open(f"result/{save_path}" ,"a") as f:
+    with open(f"result/{save_path}" ,"a") as f:        
+        f.write(f"#############Test Type: {test_type}#############\n")
         f.write("Term-overlapping\n")
         f.write(f"precision: {term_p_score}, recall: {term_r_score}, f1: {term_f1_score}\n")
         f.write("Exact-matching\n")
@@ -209,12 +218,13 @@ def main():
         f.write("Blue-score\n")
         f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n")
         f.write("BERTScore\n")
-        f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n")
+        f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n\n")
     
 if __name__ == '__main__':
     """Parameters"""
     parser  = argparse.ArgumentParser(description = "facet generation" )
     parser.add_argument( "--model_type", type=str, help = "model", default = 'baseline')
+    parser.add_argument( "--test_type", type=str, help = "model", default = 'duplicate')
     args = parser.parse_args()
     
     main()        
