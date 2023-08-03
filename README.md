@@ -1,4 +1,4 @@
-## File Download
+## File Download (수정)
 ```
 git clone https://github.com/microsoft/MIMICS
 wget http://ciir.cs.umass.edu/downloads/mimics-serp/MIMICS-BingAPI-results.zip
