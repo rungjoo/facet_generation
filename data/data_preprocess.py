@@ -22,12 +22,11 @@ for data in dataset:
     query_document[query]['related_list'] = related_list
     
 """ MIMICS loading """    
-import glob
+import glob, os
 print("MIMICS loading")
-folder = "../MIMICS/data/*"
-datapath_list = glob.glob(folder)
-train_path = datapath_list[0] # MIMICS-Click.tsv
-test_path = datapath_list[1] # MIMICS-Manual.tsv
+folder = "../MIMICS/data/"
+train_path = os.path.join(folder, "MIMICS-Click.tsv")
+test_path = os.path.join(folder, "MIMICS-Manual.tsv")
 
 import pandas as pd
 tr_df = pd.read_csv(train_path, sep = '\t')

@@ -1,26 +1,31 @@
 ## File Download (수정)
 ```
 git clone https://github.com/microsoft/MIMICS
-wget http://ciir.cs.umass.edu/downloads/mimics-serp/MIMICS-BingAPI-results.zip
+cd data
+wget http://ciir.cs.umass.edu/downloads/mimics-serp/MIMICS-BingAPI-results.zip --no-check-certificate
 ```
 
 # Data Preprocessing
-## data/MIMICS-BingAPI.jsonl 
+## split data
 Make sub files from MIMICS-BingAPI-results
 ```
-cat MIMICS-BingAPI-results | wc -l
-split -n {line_num} MIMICS-BingAPI-results mimics_
+cd data
+unzip MIMICS-BingAPI-results.zip
+cat MIMICS-BingAPI.result | wc -l # 479807
+split -l 48000 MIMICS-BingAPI.result mimics_
 ```
 
 ## data/SERP_filter.py
 Extract information from mimics_* and create MIMICS-BingAPI.jsonl
 ```
+cd data
 python3 SERP_filter.py
 ```
 
 ## data/data_preprocess.py
 Create train.json and test.json in data folder
 ```
+cd data
 python3 data_preprocess.py
 ```
 
