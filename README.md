@@ -37,7 +37,7 @@ Generate document from query
 
 # Model Train
 
-## baseline
+## query (baseline)
 - input: query
 - output: facet
 ```
