@@ -4,7 +4,7 @@ import pdb
 import json
 from tqdm import tqdm
 
-data_path = "../../data/train.json"
+data_path = "../../data/test.json"
 with open(data_path, "r") as f:
     dataset = json.load(f)
 
@@ -18,13 +18,13 @@ model = AutoModelForCausalLM.from_pretrained(
     # rope_scaling={"type": "dynamic", "factor": 2} # allows handling of longer inputs
 )
 
-llm_train = {}    
+llm_data = {}    
 for ind, data in tqdm(dataset.items()):
     query = data['query']
     facet_list = data['facet']
-    llm_train[ind] = {}
-    llm_train[ind]['query'] = query
-    llm_train[ind]['facet_info'] = []
+    llm_data[ind] = {}
+    llm_data[ind]['query'] = query
+    llm_data[ind]['facet_info'] = []
     
     for facet in facet_list:
         prompt = f"### User:\nThe facet for '{query}' is '{facet}'. To create this facet, please create the necessary information in one sentence.\n\n### Assistant:\n"
@@ -35,7 +35,7 @@ for ind, data in tqdm(dataset.items()):
         info = output[len(prompt):]
         
         facet_info = [facet, info]
-        llm_train[ind]['facet_info'].append(facet_info)
+        llm_data[ind]['facet_info'].append(facet_info)
 
-with open("LLM_train.json", "w", encoding='utf-8') as f:
-    json.dump(llm_train, f, indent="\t")
+with open("LLM_test.json", "w", encoding='utf-8') as f:
+    json.dump(llm_data, f, indent="\t")

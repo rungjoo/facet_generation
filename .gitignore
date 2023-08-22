@@ -1,5 +1,4 @@
 MIMICS
-Faspect
 
 *.json
 *.txt
@@ -13,3 +12,4 @@ data/*
 !data/*.ipynb
 !data/merge_test.json
 
+information/LLM/LLM_train.jsonl
