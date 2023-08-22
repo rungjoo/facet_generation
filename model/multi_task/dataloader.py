@@ -3,9 +3,27 @@ from transformers import AutoTokenizer
 import torch, json
     
 class data_loader(Dataset):
-    def __init__(self, data_path, tokenizer_path, data_type):
+    def __init__(self, data_path, tokenizer_path):
         with open(data_path, 'r', encoding='utf-8') as f:
-            self.dataset = json.load(f)
+            original_dataset = json.load(f)
+            
+        self.dataset = {}
+        num = 0
+        for k, data in original_dataset.items():
+            # document와 related가 있는 경우 (SERP 데이터에 query가 있는 경우임)
+            if ('document' in data) and ('related' in data):
+                document = data['document']
+                related= data['related']
+                
+                # documet와 related가 한 개 이상 할당된 경우
+                # SERP라고 해서 모두 document, related가 태깅되어 있진 않음
+                if len(document) > 0 or len(related) > 0:
+                    self.dataset[num] = {}
+                    self.dataset[num]['query'] = data['query']
+                    self.dataset[num]['facet'] = data['facet']
+                    self.dataset[num]['document'] = document
+                    self.dataset[num]['related'] = related
+                    num += 1
         
         tokenizer_path = tokenizer_path
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
@@ -16,13 +34,12 @@ class data_loader(Dataset):
         num_added_toks = self.tokenizer.add_special_tokens(special_tokens_dict)
         
         # self.tokenizer.padding_side = "left"
-        self.data_type = data_type
         
     def __len__(self): # 기본적인 구성
         return len(self.dataset)
     
     def __getitem__(self, idx): # 기본적인 구성
-        return self.dataset[str(idx)]
+        return self.dataset[idx]
     
     def make_input(self, enc_inputs, dec_inputs):
         enc_input_ids = enc_inputs['input_ids']
@@ -60,7 +77,7 @@ class data_loader(Dataset):
             facet = data['facet']
             
             try:
-                document_string = "|".join(data[self.data_type])
+                document_string = "|".join(data['document'])
             except:
                 document_string = ""
                 
@@ -85,10 +102,12 @@ class data_loader(Dataset):
             d_dec.append(d_target)
             r_dec.append(r_target)
             
+        # 앞뒤로 <s>, </s> 미포함
         f_enc_inputs = self.tokenizer(f_enc, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)
         d_enc_inputs = self.tokenizer(d_enc, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)
-        r_enc_inputs = self.tokenizer(r_enc, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt')
+        r_enc_inputs = self.tokenizer(r_enc, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt', add_special_tokens=False)
         
+        # 앞뒤로 <s>, </s> 포함
         f_dec_inputs = self.tokenizer(f_dec, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt')
         d_dec_inputs = self.tokenizer(d_dec, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt')
         r_dec_inputs = self.tokenizer(r_dec, padding=True, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors='pt')

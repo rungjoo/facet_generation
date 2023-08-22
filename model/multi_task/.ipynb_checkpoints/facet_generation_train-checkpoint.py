@@ -19,9 +19,8 @@ def main():
     batch_size = args.batch
     tokenizer_path = "/home/jovyan/hdfs-jmt-rungjoo-private/huggingface_models/bart-base"
     
-    data_type = args.data_type
-    train_path = "../data/merge_train.json"
-    train_dataset = data_loader(train_path, tokenizer_path, data_type)
+    train_path = "../../data/train.json"
+    train_dataset = data_loader(train_path, tokenizer_path)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=train_dataset.collate_fn)
     
     """logging and path"""    
@@ -43,6 +42,7 @@ def main():
     model = BartForConditionalGeneration.from_pretrained(model_path)
     model = model.cuda()
     model.train()
+    model.resize_token_embeddings(len(train_dataset.tokenizer))
     
     """Training Setting"""        
     training_epochs = args.epoch
@@ -56,9 +56,10 @@ def main():
         
     """Input & Label Setting"""
     def allocate_device(model_input):
+        model_device_input = {}
         for k, v in model_input.items():
-            device = v.to(device)
-        return model_input
+            model_device_input[k] = v.to(device)
+        return model_device_input
     
     train_dataset.tokenizer.save_pretrained(save_path)
     
@@ -66,20 +67,14 @@ def main():
         model.train() 
         for i_batch, inputs in enumerate(tqdm(train_dataloader)):            
             """Multi-task prediction"""
-            f_input, d_input, r_input = inputs
+            f_input, d_input, r_input = inputs            
             f_input = allocate_device(f_input)
             d_input = allocate_device(d_input)
             r_input = allocate_device(r_input)
             
-            "enc_input_ids"
-            "enc_attention_mask"
-            "dec_input_ids"
-            "dec_attention_mask"
-            "labels"
-            
             f_outputs = model(
                 input_ids=f_input["enc_input_ids"],
-                attention_mask=f_input["enc_attention_mask",]
+                attention_mask=f_input["enc_attention_mask"],
                 decoder_input_ids=f_input["dec_input_ids"],
                 decoder_attention_mask=f_input["dec_attention_mask"],
                 labels=f_input["labels"]
@@ -87,7 +82,7 @@ def main():
             
             d_outputs = model(
                 input_ids=d_input["enc_input_ids"],
-                attention_mask=d_input["enc_attention_mask",]
+                attention_mask=d_input["enc_attention_mask"],
                 decoder_input_ids=d_input["dec_input_ids"],
                 decoder_attention_mask=d_input["dec_attention_mask"],
                 labels=d_input["labels"]
@@ -95,12 +90,11 @@ def main():
             
             r_outputs = model(
                 input_ids=r_input["enc_input_ids"],
-                attention_mask=r_input["enc_attention_mask",]
+                attention_mask=r_input["enc_attention_mask"],
                 decoder_input_ids=r_input["dec_input_ids"],
                 decoder_attention_mask=r_input["dec_attention_mask"],
                 labels=r_input["labels"]
-            )            
-                     
+            )
             
             """Loss calculation & training"""
             loss_val = f_outputs.loss + d_outputs.loss + r_outputs.loss
@@ -117,7 +111,6 @@ def main():
 def _SaveModel(model, path):
     if not os.path.exists(path):
         os.makedirs(path)
-    # torch.save(model.state_dict(), os.path.join(path, 'pytorch_model.bin'))
     model.save_pretrained(path)
     
 
@@ -130,7 +123,6 @@ if __name__ == '__main__':
     parser.add_argument( "--epoch", type=int, help = 'training epohcs', default = 10)
     parser.add_argument( "--norm", type=int, help = "max_grad_norm", default = 10)
     parser.add_argument( "--lr", type=float, help = "learning rate", default = 1e-6) # 1e-5
-    parser.add_argument( "--data_type", type=str, help = "data_type", default = 'original')
         
     args = parser.parse_args()
     
