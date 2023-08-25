@@ -5,12 +5,23 @@ from tqdm import tqdm
 import argparse, logging
 
 def main():
-    model_type = args.model_type
-    
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+    if args.document:
+        document = "document"
+    else:
+        document = ""
+    if args.related:
+        related = "related"
+    else:
+        related = ""
+    if args.LLM:
+        LLM = "LLM"
+    else:
+        LLM = ""
+    task_name = f"{document}_{related}_{LLM}".strip("_")    
     
-    model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task"
-    save_path = "../../result/multitask.json"
+    model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task/{task_name}"
+    save_path = f"../../result/multitask_{task_name}.json"
         
     model = BartForConditionalGeneration.from_pretrained(model_path)        
     model = model.cuda()
@@ -49,7 +60,11 @@ if __name__ == '__main__':
     
     """Parameters"""
     parser  = argparse.ArgumentParser(description = "facet generation" )
-    parser.add_argument( "--model_type", type=str, help = "model", default = 'baseline')
+    
+    parser.add_argument('--document', action='store_true', help='train document')
+    parser.add_argument('--related', action='store_true', help='train related')
+    parser.add_argument('--LLM', action='store_true', help='train LLM')
+        
     args = parser.parse_args()
     
     main()    

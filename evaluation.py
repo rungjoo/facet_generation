@@ -213,7 +213,7 @@ def main():
         f.write("Exact-matching\n")
         f.write(f"precision: {exact_p_score}, recall: {exact_r_score}, f1: {exact_f1_score}\n")
         f.write("Blue-score\n")
-        f.write(f"bleu1: {bleu_s1}, bleu2: {bleu_s2}, bleu3: {bleu_s3}, bleu4: {bleu_s4}\n")
+        f.write(f"bleu1: {bleu_s1}, bleu2: {bleu_s2}, bleu3: {bleu_s3}, bleu4: {bleu_s4}\n\n")
         # f.write("BERTScore\n")
         # f.write(f"precision: {bert_p_score}, recall: {bert_r_score}, f1: {bert_f1_score}\n\n")
         
@@ -223,7 +223,7 @@ def main():
         f.write("Exact-matching\n")
         f.write(f"precision: {filter_exact_p_score}, recall: {filter_exact_r_score}, f1: {filter_exact_f1_score}\n")
         f.write("Blue-score\n")
-        f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n")
+        f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n\n")
         # f.write("BERTScore\n")
         # f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n\n")
     

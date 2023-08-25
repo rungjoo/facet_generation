@@ -1,4 +1,4 @@
-import os
+import os, sys
 import pdb
 import argparse, logging
 from tqdm import tqdm
@@ -14,6 +14,22 @@ from transformers import AutoTokenizer, BartForConditionalGeneration
 ## finetune gpt2
 def main():    
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+    if args.document:
+        document = "document"
+    else:
+        document = ""
+    if args.related:
+        related = "related"
+    else:
+        related = ""
+    if args.LLM:
+        LLM = "LLM"
+    else:
+        LLM = ""
+    task_name = f"{document}_{related}_{LLM}".strip("_")
+    if task_name == "":
+        print("멀티테스크를 입력하세요")
+        sys.exit()
     
     """Dataset Loading"""    
     batch_size = args.batch
@@ -24,7 +40,7 @@ def main():
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=train_dataset.collate_fn)
     
     """logging and path"""    
-    save_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task"
+    save_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task/{task_name}"
     print("###Save Path### ", save_path)
     log_path = "train.log"
     if not os.path.exists(save_path):
@@ -80,24 +96,30 @@ def main():
                 labels=f_input["labels"]
             )
             
-            d_outputs = model(
-                input_ids=d_input["enc_input_ids"],
-                attention_mask=d_input["enc_attention_mask"],
-                decoder_input_ids=d_input["dec_input_ids"],
-                decoder_attention_mask=d_input["dec_attention_mask"],
-                labels=d_input["labels"]
-            )
+            if args.document:
+                d_outputs = model(
+                    input_ids=d_input["enc_input_ids"],
+                    attention_mask=d_input["enc_attention_mask"],
+                    decoder_input_ids=d_input["dec_input_ids"],
+                    decoder_attention_mask=d_input["dec_attention_mask"],
+                    labels=d_input["labels"]
+                )
             
-            r_outputs = model(
-                input_ids=r_input["enc_input_ids"],
-                attention_mask=r_input["enc_attention_mask"],
-                decoder_input_ids=r_input["dec_input_ids"],
-                decoder_attention_mask=r_input["dec_attention_mask"],
-                labels=r_input["labels"]
-            )
+            if args.related:
+                r_outputs = model(
+                    input_ids=r_input["enc_input_ids"],
+                    attention_mask=r_input["enc_attention_mask"],
+                    decoder_input_ids=r_input["dec_input_ids"],
+                    decoder_attention_mask=r_input["dec_attention_mask"],
+                    labels=r_input["labels"]
+                )
             
             """Loss calculation & training"""
-            loss_val = f_outputs.loss + d_outputs.loss + r_outputs.loss
+            loss_val = f_outputs.loss
+            if args.document:
+                loss_val += d_outputs.loss
+            if args.related:
+                loss_val += r_outputs.loss
             loss_val.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)  # Gradient clipping is not in AdamW anymore (so you can use amp without issue)
             optimizer.step()
@@ -123,6 +145,10 @@ if __name__ == '__main__':
     parser.add_argument( "--epoch", type=int, help = 'training epohcs', default = 10)
     parser.add_argument( "--norm", type=int, help = "max_grad_norm", default = 10)
     parser.add_argument( "--lr", type=float, help = "learning rate", default = 1e-6) # 1e-5
+    
+    parser.add_argument('--document', action='store_true', help='train document')
+    parser.add_argument('--related', action='store_true', help='train related')
+    parser.add_argument('--LLM', action='store_true', help='train LLM')
         
     args = parser.parse_args()
     
