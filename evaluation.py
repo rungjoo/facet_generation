@@ -111,12 +111,30 @@ def cal_mean(result_list):
 def main():
     model_type = args.model_type
     test_type = args.test_type
+    
+    if args.document:
+        document = "document"
+    else:
+        document = ""
+    if args.related:
+        related = "related"
+    else:
+        related = ""
+    if args.LLM:
+        LLM = "LLM"
+    else:
+        LLM = ""
+    task_name = f"{document}_{related}_{LLM}".strip("_")       
+    
     if model_type == 'gpt3':
         result_path = "result/gpt3_facets.json"
         save_path = "result_gpt3.txt"    
+    elif model_type == "multitask":
+        result_path = f"result/{model_type}_{task_name}.json"
+        save_path = f"result_{model_type}_{task_name}.txt"
     else: ## ictir
         result_path = f"result/{model_type}.json"
-        save_path = f"result_{model_type}.txt"        
+        save_path = f"result_{model_type}.txt"
         
     with open(result_path, 'r', encoding='utf-8') as f:
         result = json.load(f)
@@ -232,6 +250,11 @@ if __name__ == '__main__':
     parser  = argparse.ArgumentParser(description = "facet generation" )
     parser.add_argument( "--model_type", type=str, help = "model", default = 'baseline')
     parser.add_argument( "--test_type", type=str, help = "model", default = 'duplicate')
+    
+    parser.add_argument('--document', action='store_true', help='train document')
+    parser.add_argument('--related', action='store_true', help='train related')
+    parser.add_argument('--LLM', action='store_true', help='train LLM')
+    
     args = parser.parse_args()
     
     main()        

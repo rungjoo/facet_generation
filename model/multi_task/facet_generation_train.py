@@ -51,6 +51,7 @@ def main():
     logger.addHandler(fileHandler)    
     logger.setLevel(level=logging.DEBUG)      
     
+    logger.info('Task name: {}'.format(task_name))
     logger.info('Batch size: {}'.format(batch_size))
     
     """Model Loading"""

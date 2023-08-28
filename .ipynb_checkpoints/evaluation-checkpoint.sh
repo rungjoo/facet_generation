@@ -7,7 +7,7 @@
 # python3 evaluation.py --model_type query_related_pred
 # python3 evaluation.py --model_type query_document_pick
 # python3 evaluation.py --model_type query_pick_document_label
-python3 evaluation.py --model_type multitask
+python3 evaluation.py --model_type multitask --related
 
 # python3 evaluation.py --model_type ictir_abstractive
 # python3 evaluation.py --model_type ictir_abstractive_query
@@ -26,7 +26,7 @@ python3 evaluation.py --model_type multitask
 # python3 evaluation.py --model_type query_related_pred --test_type unique
 # python3 evaluation.py --model_type query_document_pick --test_type unique
 # python3 evaluation.py --model_type query_pick_document_label --test_type unique
-python3 evaluation.py --model_type multitask --test_type unique
+python3 evaluation.py --model_type multitask --related --test_type unique
 
 # python3 evaluation.py --model_type ictir_abstractive --test_type unique
 # python3 evaluation.py --model_type ictir_abstractive_query --test_type unique
