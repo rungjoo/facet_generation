@@ -2,6 +2,7 @@ MIMICS
 
 *.json
 *.txt
+*.jsonl
 *nohup*
 *.log
 
