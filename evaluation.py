@@ -5,10 +5,8 @@ import itertools
 from tqdm import tqdm
 import pdb
 
-# from evaluate import load
-# bertscore_func = load("bertscore")
-# from bert_score import score
-# bertscore_func = score
+from evaluate import load
+bertscore_func = load("bertscore")
 from nltk.translate.bleu_score import sentence_bleu
 
 def best_bleu_cand_ori(groundtruth, candidate):
@@ -59,11 +57,8 @@ def bertscore(groundtruth, cand):
         groundtruth = groundtruth[:len(best_cand)]
     else:
         best_cand = best_cand[:len(groundtruth)]
-    # results = bertscore_func.compute(predictions=best_cand, references=groundtruth, lang="en", device="cuda:0")
-    # precision, recall, f1 = results['precision'], results['recall'], results['f1']
-    
-    results = bertscore_func(best_cand, groundtruth, lang="en", device="cuda:0")
-    precision, recall, f1 = results
+    results = bertscore_func.compute(predictions=best_cand, references=groundtruth, lang="en", device="cuda:0")
+    precision, recall, f1 = results['precision'], results['recall'], results['f1']
     
     P, R, F = sum(precision)/len(precision), sum(recall)/len(recall), sum(f1)/len(f1)
     return P, R, F
@@ -112,26 +107,9 @@ def main():
     model_type = args.model_type
     test_type = args.test_type
     
-    if args.document:
-        document = "document"
-    else:
-        document = ""
-    if args.related:
-        related = "related"
-    else:
-        related = ""
-    if args.LLM:
-        LLM = "LLM"
-    else:
-        LLM = ""
-    task_name = f"{document}_{related}_{LLM}".strip("_")       
-    
     if model_type == 'gpt3':
         result_path = "result/gpt3_facets.json"
-        save_path = "result_gpt3.txt"    
-    elif model_type == "multitask":
-        result_path = f"result/{model_type}_{task_name}.json"
-        save_path = f"result_{model_type}_{task_name}.txt"
+        save_path = "result_gpt3.txt"
     else: ## ictir
         result_path = f"result/{model_type}.json"
         save_path = f"result_{model_type}.txt"
@@ -185,13 +163,13 @@ def main():
         bleu_list3.append(bleu3)
         bleu_list4.append(bleu4)
         
-        # if len(pred_list) == 0:
-        #     bert_p, bert_r, bert_f1 = 0, 0, 0
-        # else:
-        #     bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list)
-        # bert_p_list.append(bert_p)
-        # bert_r_list.append(bert_r)
-        # bert_f1_list.append(bert_f1)
+        if len(pred_list) == 0:
+            bert_p, bert_r, bert_f1 = 0, 0, 0
+        else:
+            bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list)
+        bert_p_list.append(bert_p)
+        bert_r_list.append(bert_r)
+        bert_f1_list.append(bert_f1)
         
         if options_overall_label >= 1:
             filter_exact_p_list.append(exact_p)
@@ -207,9 +185,9 @@ def main():
             filter_bleu_list3.append(bleu3)
             filter_bleu_list4.append(bleu4)
             
-            # filter_bert_p_list.append(bert_p)
-            # filter_bert_r_list.append(bert_r)
-            # filter_bert_f1_list.append(bert_f1)            
+            filter_bert_p_list.append(bert_p)
+            filter_bert_r_list.append(bert_r)
+            filter_bert_f1_list.append(bert_f1)            
 
     exact_p_score, exact_r_score, exact_f1_score = cal_mean(exact_p_list), cal_mean(exact_r_list), cal_mean(exact_f1_list)
     filter_exact_p_score, filter_exact_r_score, filter_exact_f1_score = cal_mean(filter_exact_p_list), cal_mean(filter_exact_r_list), cal_mean(filter_exact_f1_list)
@@ -221,8 +199,8 @@ def main():
     filter_bleu_s1, filter_bleu_s2, filter_bleu_s3, filter_bleu_s4 =\
         cal_mean(filter_bleu_list1), cal_mean(filter_bleu_list2), cal_mean(filter_bleu_list3), cal_mean(filter_bleu_list4)
     
-    # bert_p_score, bert_r_score, bert_f1_score = cal_mean(bert_p_list), cal_mean(bert_r_list), cal_mean(bert_f1_list)
-    # filter_bert_p_score, filter_bert_r_score, filter_bert_f1_score = cal_mean(filter_bert_p_list), cal_mean(filter_bert_r_list), cal_mean(filter_bert_f1_list)
+    bert_p_score, bert_r_score, bert_f1_score = cal_mean(bert_p_list), cal_mean(bert_r_list), cal_mean(bert_f1_list)
+    filter_bert_p_score, filter_bert_r_score, filter_bert_f1_score = cal_mean(filter_bert_p_list), cal_mean(filter_bert_r_list), cal_mean(filter_bert_f1_list)
     
     with open(f"result/{save_path}" ,"a") as f:        
         f.write(f"#############Test Type: {test_type}#############\n")
@@ -231,9 +209,9 @@ def main():
         f.write("Exact-matching\n")
         f.write(f"precision: {exact_p_score}, recall: {exact_r_score}, f1: {exact_f1_score}\n")
         f.write("Blue-score\n")
-        f.write(f"bleu1: {bleu_s1}, bleu2: {bleu_s2}, bleu3: {bleu_s3}, bleu4: {bleu_s4}\n\n")
-        # f.write("BERTScore\n")
-        # f.write(f"precision: {bert_p_score}, recall: {bert_r_score}, f1: {bert_f1_score}\n\n")
+        f.write(f"bleu1: {bleu_s1}, bleu2: {bleu_s2}, bleu3: {bleu_s3}, bleu4: {bleu_s4}\n")
+        f.write("BERTScore\n")
+        f.write(f"precision: {bert_p_score}, recall: {bert_r_score}, f1: {bert_f1_score}\n\n")
         
         f.write("Filter Result - options_overall_label >= 1\n")
         f.write("Term-overlapping\n")
@@ -241,9 +219,9 @@ def main():
         f.write("Exact-matching\n")
         f.write(f"precision: {filter_exact_p_score}, recall: {filter_exact_r_score}, f1: {filter_exact_f1_score}\n")
         f.write("Blue-score\n")
-        f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n\n")
-        # f.write("BERTScore\n")
-        # f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n\n")
+        f.write(f"bleu1: {filter_bleu_s1}, bleu2: {filter_bleu_s2}, bleu3: {filter_bleu_s3}, bleu4: {filter_bleu_s4}\n")
+        f.write("BERTScore\n")
+        f.write(f"precision: {filter_bert_p_score}, recall: {filter_bert_r_score}, f1: {filter_bert_f1_score}\n\n")
     
 if __name__ == '__main__':
     """Parameters"""

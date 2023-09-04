@@ -12,14 +12,14 @@ def main():
     related_type = args.related_type
     if model_type == "query_related_bart":
         model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/query_related_bart"
-        save_path = f"../result/query_related_{related_type}.json"
+        save_path = f"../../result/query_related_{related_type}.json"
         
     model = BartForConditionalGeneration.from_pretrained(model_path)        
     model = model.cuda()
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(model_path)
 
-    with open("../data/merge_test.json", 'r', encoding='utf-8') as f:
+    with open("../../data/merge_test.json", 'r', encoding='utf-8') as f:
         test_data = json.load(f)
 
     test_result = {}
@@ -29,6 +29,8 @@ def main():
             related_string = "|".join(data['label_related'])
         elif related_type == "pred":
             related_string = "|".join(data['pred_related'])
+        elif related_type == "none":
+            related_string = ""            
             
         input_string = f"{query}:{related_string}"
         options_overall_label = data['options_overall_label']
