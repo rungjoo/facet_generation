@@ -29,7 +29,15 @@ cd data
 python3 data_preprocess.py
 ```
 
-## document
+## rationale
+Generate rationale from query and facet
+```
+cd information/LLM
+python3 generate_information.py
+python3 construct_train_dataset.py
+```
+
+## pick information document
 Generate document from query
 
 ## related

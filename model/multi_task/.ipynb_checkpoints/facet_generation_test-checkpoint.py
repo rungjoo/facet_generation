@@ -6,6 +6,10 @@ import argparse, logging
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+    if args.pick:
+        pick = "pick"
+    else:
+        pick = ""
     if args.document:
         document = "document"
     else:
@@ -14,11 +18,15 @@ def main():
         related = "related"
     else:
         related = ""
-    if args.LLM:
-        LLM = "LLM"
+    if args.rationale:
+        rationale = "rationale"
     else:
-        LLM = ""
-    task_name = f"{document}_{related}_{LLM}".strip("_")    
+        rationale = ""
+        
+    if args.task_name:
+        task_name = args.task_name
+    else:
+        task_name = f"{pick}_{document}_{related}_{rationale}".strip("_")    
     
     model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task/{task_name}"
     save_path = f"../../result/multitask_{task_name}.json"
@@ -61,9 +69,11 @@ if __name__ == '__main__':
     """Parameters"""
     parser  = argparse.ArgumentParser(description = "facet generation" )
     
+    parser.add_argument('--task_name', type=str, help='task name', default = "")
+    parser.add_argument('--pick', action='store_true', help='train pick')
     parser.add_argument('--document', action='store_true', help='train document')
     parser.add_argument('--related', action='store_true', help='train related')
-    parser.add_argument('--LLM', action='store_true', help='train LLM')
+    parser.add_argument('--rationale', action='store_true', help='train rationale')
         
     args = parser.parse_args()
     

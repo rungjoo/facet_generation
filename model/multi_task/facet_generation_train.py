@@ -22,11 +22,11 @@ def main():
         related = "related"
     else:
         related = ""
-    if args.LLM:
-        LLM = "LLM"
+    if args.rationale:
+        rationale = "rationale"
     else:
-        LLM = ""
-    task_name = f"{document}_{related}_{LLM}".strip("_")
+        rationale = ""
+    task_name = f"{document}_{related}_{rationale}".strip("_")
     if task_name == "":
         print("멀티테스크를 입력하세요")
         sys.exit()
@@ -36,7 +36,7 @@ def main():
     tokenizer_path = "/home/jovyan/hdfs-jmt-rungjoo-private/huggingface_models/bart-base"
     
     train_path = "../../data/train.json"
-    train_dataset = data_loader(train_path, tokenizer_path)
+    train_dataset = data_loader(train_path, tokenizer_path)    
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=train_dataset.collate_fn)
     
     """logging and path"""    
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--document', action='store_true', help='train document')
     parser.add_argument('--related', action='store_true', help='train related')
-    parser.add_argument('--LLM', action='store_true', help='train LLM')
+    parser.add_argument('--rationale', action='store_true', help='train rationale')
         
     args = parser.parse_args()
     

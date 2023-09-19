@@ -111,8 +111,8 @@ def main():
         result_path = "result/gpt3_facets.json"
         save_path = "result_gpt3.txt"
     else: ## ictir
-        result_path = f"result/{model_type}.json"
-        save_path = f"result_{model_type}.txt"
+        result_path = f"result_filter/{model_type}.json"
+        save_path = f"result_filter/{model_type}.txt"
         
     with open(result_path, 'r', encoding='utf-8') as f:
         result = json.load(f)
@@ -202,7 +202,7 @@ def main():
     bert_p_score, bert_r_score, bert_f1_score = cal_mean(bert_p_list), cal_mean(bert_r_list), cal_mean(bert_f1_list)
     filter_bert_p_score, filter_bert_r_score, filter_bert_f1_score = cal_mean(filter_bert_p_list), cal_mean(filter_bert_r_list), cal_mean(filter_bert_f1_list)
     
-    with open(f"result/{save_path}" ,"a") as f:        
+    with open(f"{save_path}" ,"a") as f:        
         f.write(f"#############Test Type: {test_type}#############\n")
         f.write("Term-overlapping\n")
         f.write(f"precision: {term_p_score}, recall: {term_r_score}, f1: {term_f1_score}\n")

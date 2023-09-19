@@ -66,19 +66,22 @@ def main():
         options_overall_label = data['options_overall_label']
         
         prompt = make_prompt(query, pred_facets, method)
-        # one_shot = """### User:\nThe predicted facets for 'caesars atlantic city' are 'parking, hotels'. But the correct facets are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
-        # two_shot = """The predicted facets for 'vista, ca' are 'parking, hotels'. But the correct facets are 'weather, zip code, population, homes for sale'\n\n"""
-        # prompt = one_shot + two_shot + f"""As in the example above, modify the predicted facets.\nThe predicted facets for '{query}' are '{pred_facets}'. What are the correct facets?\n\n### Assistant:\nThe correct facets for '{query}' are"""
+        
+        label_inputs = tokenizer(pred_facets, return_tensors="pt")
+        label_len = label_inputs['input_ids'].shape[1]        
 
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
         
-        output = model.generate(**inputs, use_cache=True, max_new_tokens=100, temperature=0.001, top_p=1)
+        output = model.generate(**inputs, use_cache=True, max_new_tokens=int(label_len*2), temperature=0.001, top_p=1)
         output = tokenizer.decode(output[0], skip_special_tokens=True)
         correct_facets = output[len(prompt):]
         
         try:
-            # correct_facet_list = [x.strip() for x in correct_facets.strip().split("\n")[0].strip("'").strip(".").strip("'").split(",") if x.strip() != ""]
-            correct_facet_list = [x.strip() for x in matches[0].strip("'").split(",") if x.strip() != ""]
+            matches = eng_rule.findall(correct_facets.strip())
+            if len(matches) == 1:
+                correct_facet_list = [x.strip() for x in matches[0].strip("'").split(",") if x.strip() != ""]
+            else:
+                correct_facet_list = [x.strip() for x in correct_facets.strip().split("\n")[0].strip("'").strip(".").strip("'").split(",") if x.strip() != ""]
             test_result[k] = {}
             test_result[k]['query'] = query
             test_result[k]['pred'] = correct_facet_list

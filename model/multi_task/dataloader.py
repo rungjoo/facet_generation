@@ -13,7 +13,7 @@ class data_loader(Dataset):
             # document와 related가 있는 경우 (SERP 데이터에 query가 있는 경우임)
             if ('document' in data) and ('related' in data):
                 document = data['document']
-                related= data['related']
+                related = data['related']
                 
                 # documet와 related가 한 개 이상 할당된 경우
                 # SERP라고 해서 모두 document, related가 태깅되어 있진 않음
@@ -30,7 +30,7 @@ class data_loader(Dataset):
         if self.tokenizer.pad_token_id == None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             
-        special_tokens_dict = {'additional_special_tokens': ['[facet]', '[document]', '[related]', '[information]']}
+        special_tokens_dict = {'additional_special_tokens': ['[facet]', '[document]', '[related]']}
         num_added_toks = self.tokenizer.add_special_tokens(special_tokens_dict)
         
         # self.tokenizer.padding_side = "left"
@@ -68,7 +68,7 @@ class data_loader(Dataset):
                 batch_padding_input_token: (B, L) padded
                 batch_padding_attention_mask:
         '''
-        ftoken, dtoken, rtoken, itoken = ['[facet]', '[document]', '[related]', '[information]']
+        ftoken, dtoken, rtoken = ['[facet]', '[document]', '[related]']
         
         f_enc, d_enc, r_enc = [], [], []
         f_dec, d_dec, r_dec = [], [], []
