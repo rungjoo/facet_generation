@@ -30,6 +30,8 @@ def main():
     
     model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task/{task_name}"
     save_path = f"../../result/multitask_{task_name}.json"
+    
+    print(f"Model path: {model_path}")
         
     model = BartForConditionalGeneration.from_pretrained(model_path)        
     model = model.cuda()

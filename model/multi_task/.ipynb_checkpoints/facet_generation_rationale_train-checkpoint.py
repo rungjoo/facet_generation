@@ -38,7 +38,7 @@ def main():
     
     train_path = "../../data/train_rationale_7B.json"
     train_dataset = data_loader(train_path, tokenizer_path)    
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=train_dataset.collate_fn)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=4, collate_fn=train_dataset.collate_fn)
     
     """logging and path"""    
     save_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/multi_task/{task_name}"
@@ -125,6 +125,19 @@ def main():
                     decoder_attention_mask=i_input["dec_attention_mask"],
                     labels=i_input["labels"]
                 )
+            
+            # print(train_dataset.tokenizer.decode(f_input["enc_input_ids"][0]))
+            # print(train_dataset.tokenizer.decode(f_input["dec_input_ids"][0]))
+            # print("#####")
+            # print(train_dataset.tokenizer.decode(d_input["enc_input_ids"][0]))
+            # print(train_dataset.tokenizer.decode(d_input["dec_input_ids"][0]))
+            # print("#####")
+            # print(train_dataset.tokenizer.decode(r_input["enc_input_ids"][0]))
+            # print(train_dataset.tokenizer.decode(r_input["dec_input_ids"][0]))
+            # print("#####")
+            # print(train_dataset.tokenizer.decode(i_input["enc_input_ids"][0]))
+            # print(train_dataset.tokenizer.decode(i_input["dec_input_ids"][0]))
+            # pdb.set_trace()
             
             """Loss calculation & training"""
             loss_val = f_outputs.loss

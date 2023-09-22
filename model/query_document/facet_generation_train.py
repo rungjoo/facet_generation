@@ -25,7 +25,7 @@ def main():
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, collate_fn=train_dataset.collate_fn)
     
     """logging and path"""    
-    save_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/query_pick_document_bart"
+    save_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/save_models/facet/query_document"
     print("###Save Path### ", save_path)
     log_path = "train.log"
     if not os.path.exists(save_path):

@@ -88,7 +88,10 @@ class data_loader(Dataset):
             except:
                 related_string = ""
                 
-            info_string = ", ".join(data['rationale'])
+            try:
+                info_string = "|".join(data['rationale'])
+            except:
+                info_string = ""
                 
             f_string = f"{ftoken} {query_string}"
             d_string = f"{dtoken} {query_string}"

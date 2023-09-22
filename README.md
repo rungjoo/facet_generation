@@ -1,6 +1,7 @@
-## File Download (수정)
+## File Download
 ```
 git clone https://github.com/microsoft/MIMICS
+mkdir data
 cd data
 wget http://ciir.cs.umass.edu/downloads/mimics-serp/MIMICS-BingAPI-results.zip --no-check-certificate
 ```
@@ -33,32 +34,54 @@ python3 data_preprocess.py
 Generate rationale from query and facet
 ```
 cd information/LLM
-python3 generate_information.py
+python3 generate_information7B.py
 python3 construct_train_dataset.py
 ```
 
 ## pick information document
 Generate document from query
 
-## related
-Generate document from query
-
 # Model Train
 
-## query (baseline)
+## query
 - input: query
 - output: facet
 ```
-python3 facet_generation_train.py --model_type {type}
+cd model/query
+python3 facet_generation_train.py --batch 4 --epoch 10
 ```
 
 ## query_documet
 - input: query+documet
 - output: facet
+```
+cd model/query_document
+python3 facet_generation_train.py
+```
 
 ## query_related
 - input: query+related
 - output: facet
+```
+cd model/query_related
+python3 facet_generation_train.py
+```
+
+## multi-task
+- input: query
+- output: facet / document / related
+```
+cd model/multi_task
+python3 facet_generation_train.py --args
+```
+
+# LLM post-processing
+- input: generated facets
+- output: re-generated facets
+```
+cd model/LLM
+python3 facet_generation_test.py --args
+```
 
 # Test
 All reulsts are included in result folder

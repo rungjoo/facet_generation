@@ -15,7 +15,7 @@ test_result_list = glob.glob("result/*.json")
 for data_path in tqdm(test_result_list):
     if data_path == 'result/gpt3_facets.json':
         continue
-    if data_path in ["result/query_document_none.json", "result/query_related_none.json"]:
+    if data_path in ["result/multitask_rationale.json"]:
         with open(data_path, 'r') as f:
             dataset1 = json.load(f)       
         our_dataset = {}
