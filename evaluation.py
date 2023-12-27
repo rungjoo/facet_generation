@@ -103,6 +103,17 @@ def term_match(groundtruth, cand):
 def cal_mean(result_list):
     return sum(result_list)/len(result_list)
 
+def pred_filter(query, facets):
+    filter_facets = []
+    for facet in facets:
+        if query == facet.strip():
+            pass
+        if len(facet) < 2:
+            pass
+        else:
+            filter_facets.append(facet)
+    return filter_facets
+
 def main():
     model_type = args.model_type
     test_type = args.test_type
@@ -136,7 +147,8 @@ def main():
             else:
                 test_query_set.add(query)
         
-        pred_list = data['pred']        
+        pred_list = data['pred']
+        # pred_list = pred_filter(query, pred_list)
         label_list = data['label']
         options_overall_label = data['options_overall_label']    
         
