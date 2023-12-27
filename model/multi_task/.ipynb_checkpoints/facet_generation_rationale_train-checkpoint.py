@@ -126,19 +126,6 @@ def main():
                     labels=i_input["labels"]
                 )
             
-            # print(train_dataset.tokenizer.decode(f_input["enc_input_ids"][0]))
-            # print(train_dataset.tokenizer.decode(f_input["dec_input_ids"][0]))
-            # print("#####")
-            # print(train_dataset.tokenizer.decode(d_input["enc_input_ids"][0]))
-            # print(train_dataset.tokenizer.decode(d_input["dec_input_ids"][0]))
-            # print("#####")
-            # print(train_dataset.tokenizer.decode(r_input["enc_input_ids"][0]))
-            # print(train_dataset.tokenizer.decode(r_input["dec_input_ids"][0]))
-            # print("#####")
-            # print(train_dataset.tokenizer.decode(i_input["enc_input_ids"][0]))
-            # print(train_dataset.tokenizer.decode(i_input["dec_input_ids"][0]))
-            # pdb.set_trace()
-            
             """Loss calculation & training"""
             loss_val = f_outputs.loss
             if args.document:
@@ -146,7 +133,7 @@ def main():
             if args.related:
                 loss_val += r_outputs.loss
             if args.rationale:
-                loss_val += i_outputs.loss
+                loss_val += i_outputs.loss*0.05
             loss_val.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)  # Gradient clipping is not in AdamW anymore (so you can use amp without issue)
             optimizer.step()

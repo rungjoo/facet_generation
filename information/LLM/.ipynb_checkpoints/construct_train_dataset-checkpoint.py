@@ -23,9 +23,9 @@ new_train_dataset = {}
 ind = 0
 for query, facet_info in tqdm(facet_dict.items()):
     original_data = original_dict[query]
+    original_data['rationale'] = facet_info
     
     new_train_dataset[ind] = original_data
-    new_train_dataset[ind]['rationale'] = facet_info
     
     ind += 1
     

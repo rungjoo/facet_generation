@@ -6,7 +6,7 @@ from tqdm import tqdm
 import torch
 from transformers import get_linear_schedule_with_warmup
 
-from dataloader_rationale import data_loader
+from dataloader_co import data_loader
 from torch.utils.data import DataLoader
 
 from transformers import AutoTokenizer, BartForConditionalGeneration
@@ -22,11 +22,8 @@ def main():
         related = "related"
     else:
         related = ""
-    if args.rationale:
-        rationale = "rationale"
-    else:
-        rationale = ""
-    task_name = f"{document}_{related}_{rationale}".strip("_")    
+    rationale = "rationale"
+    task_name = f"co_{document}_{related}_{rationale}".strip("_")    
     # task_name = "rationale_baseline"
     if task_name == "":
         print("멀티테스크를 입력하세요")
@@ -85,11 +82,10 @@ def main():
         model.train() 
         for i_batch, inputs in enumerate(tqdm(train_dataloader)):            
             """Multi-task prediction"""
-            f_input, d_input, r_input, i_input = inputs            
+            f_input, d_input, r_input = inputs            
             f_input = allocate_device(f_input)
             d_input = allocate_device(d_input)
             r_input = allocate_device(r_input)
-            i_input = allocate_device(i_input)
             
             f_outputs = model(
                 input_ids=f_input["enc_input_ids"],
@@ -116,15 +112,6 @@ def main():
                     decoder_attention_mask=r_input["dec_attention_mask"],
                     labels=r_input["labels"]
                 )
-                
-            if args.rationale:
-                i_outputs = model(
-                    input_ids=i_input["enc_input_ids"],
-                    attention_mask=i_input["enc_attention_mask"],
-                    decoder_input_ids=i_input["dec_input_ids"],
-                    decoder_attention_mask=i_input["dec_attention_mask"],
-                    labels=i_input["labels"]
-                )
             
             """Loss calculation & training"""
             loss_val = f_outputs.loss
@@ -132,8 +119,6 @@ def main():
                 loss_val += d_outputs.loss
             if args.related:
                 loss_val += r_outputs.loss
-            if args.rationale:
-                loss_val += i_outputs.loss*0.05
             loss_val.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)  # Gradient clipping is not in AdamW anymore (so you can use amp without issue)
             optimizer.step()

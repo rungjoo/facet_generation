@@ -1,1 +1,1 @@
-python3 facet_generation_rationale_train.py --batch 4 --epoch 10 --rationale
+python3 facet_generation_co_train.py --batch 4 --epoch 10 --rationale

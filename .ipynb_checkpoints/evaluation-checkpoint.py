@@ -50,14 +50,14 @@ def eval_bleu(groundtruth, cand):
     return bleu
 
 
-def bertscore(groundtruth, cand):
+def bertscore(groundtruth, cand, bert_type):
     # Calculates the Set BERT-Score metrics for Precision, Recall & F1
     best_cand = best_bleu_cand(groundtruth, cand)
     if len(groundtruth) > len(best_cand):
         groundtruth = groundtruth[:len(best_cand)]
     else:
         best_cand = best_cand[:len(groundtruth)]
-    results = bertscore_func.compute(predictions=best_cand, references=groundtruth, lang="en", device="cuda:0")
+    results = bertscore_func.compute(predictions=best_cand, references=groundtruth, lang="en", model_type=bert_type, device="cuda:0")
     precision, recall, f1 = results['precision'], results['recall'], results['f1']
     
     P, R, F = sum(precision)/len(precision), sum(recall)/len(recall), sum(f1)/len(f1)
@@ -106,13 +106,11 @@ def cal_mean(result_list):
 def main():
     model_type = args.model_type
     test_type = args.test_type
+    bert_type = args.bert_type
+    # bert_type = "bert-base-uncased"
     
-    if model_type == 'gpt3':
-        result_path = "result/gpt3_facets.json"
-        save_path = "result_gpt3.txt"
-    else: ## ictir
-        result_path = f"result_filter/{model_type}.json"
-        save_path = f"result_filter/{model_type}.txt"
+    result_path = f"result_filter/{model_type}.json"
+    save_path = f"result_filter/{model_type}.txt"
         
     with open(result_path, 'r', encoding='utf-8') as f:
         result = json.load(f)
@@ -142,7 +140,8 @@ def main():
         label_list = data['label']
         options_overall_label = data['options_overall_label']    
         
-        ## 최대 5개가 후보이므로
+        ## 최대 5개가 후보
+        ## 모델에 따라 (예. LLM post-processing)은 5개 이상 생성할 수 있어서 앞의 것에서 짜름
         pred_list = pred_list[:5]
         pred_list = best_bleu_cand_ori(label_list, pred_list)
 
@@ -166,7 +165,7 @@ def main():
         if len(pred_list) == 0:
             bert_p, bert_r, bert_f1 = 0, 0, 0
         else:
-            bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list)
+            bert_p, bert_r, bert_f1 = bertscore(label_list, pred_list, bert_type)
         bert_p_list.append(bert_p)
         bert_r_list.append(bert_r)
         bert_f1_list.append(bert_f1)
@@ -204,6 +203,7 @@ def main():
     
     with open(f"{save_path}" ,"a") as f:        
         f.write(f"#############Test Type: {test_type}#############\n")
+        f.write(f"#############BERT Model: {bert_type}#############\n")
         f.write("Term-overlapping\n")
         f.write(f"precision: {term_p_score}, recall: {term_r_score}, f1: {term_f1_score}\n")
         f.write("Exact-matching\n")
@@ -228,6 +228,7 @@ if __name__ == '__main__':
     parser  = argparse.ArgumentParser(description = "facet generation" )
     parser.add_argument( "--model_type", type=str, help = "model", default = 'baseline')
     parser.add_argument( "--test_type", type=str, help = "model", default = 'duplicate')
+    parser.add_argument( "--bert_type", type=str, help = "model", default = "roberta-large")
     
     parser.add_argument('--document', action='store_true', help='train document')
     parser.add_argument('--related', action='store_true', help='train related')
