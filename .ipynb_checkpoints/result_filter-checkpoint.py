@@ -11,18 +11,18 @@ for data in dataset2:
     
 """ 우리의 결과 쿼리 align """    
 import glob
-test_result_list = glob.glob("result/*.json")
+# test_result_list = glob.glob("result/*.json")
+test_result_list = glob.glob("result/*noshot.json")
 for data_path in tqdm(test_result_list):
     if data_path == 'result/gpt3_facets.json':
         continue
-    if data_path in ["result/multitask_rationale.json"]:
+    else:
         with open(data_path, 'r') as f:
             dataset1 = json.load(f)       
         our_dataset = {}
         for ind, data in dataset1.items():
             query = data['query']
             our_dataset[query] = data
-
         """ 테스트할 파일로 저장 """
         save_path = data_path.replace("result", "result_filter")
         strucutred_dataset = {}

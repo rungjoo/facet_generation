@@ -9,25 +9,16 @@ def make_prompt(query, pred_facets, method):
     if method == "post":
         one_shot = """### User:\nThe predicted facets for 'caesars atlantic city' are 'parking, hotels'. But the correct facets are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
         two_shot = """The predicted facets for 'vista, ca' are 'parking, hotels'. But the correct facets are 'weather, zip code, population, homes for sale'\n\n"""
-        prompt = one_shot + two_shot + f"""As in the example above, modify the predicted facets.\nThe predicted facets for '{query}' are '{pred_facets}'. What are the correct facets?\n\n### Assistant:\nThe correct facets for '{query}' are"""    
-    else: # unseen
+        prompt = one_shot + two_shot + f"""As in the example above, modify the predicted facets.\nThe predicted facets for '{query}' are '{pred_facets}'. What are the correct facets?\n\n### Assistant:\nThe correct facets for '{query}' are"""
+    elif method == "zero":
         one_shot = """### User:\nThe facets for 'caesars atlantic city' are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
         two_shot = """The facets for 'vista, ca' are 'weather, zip code, population, homes for sale'\n\n"""
         prompt = one_shot + two_shot + f"""### Assistant:\nThe correct facets for '{query}' are"""    
+    else: # noshot
+        prompt = "### User:\nThe facets for '{query}' are '{facets}'\nAs in the format above, generate facets related to the query within 5, separated by ','.\n\n"
+        prompt += f"""### Assistant:\nThe facets for '{query}' are"""
     
     return prompt
-
-# def make_prompt(query, pred_facets, method):
-#     if method == "post":
-#         one_shot = """### Instruction:\nThe predicted facets for 'caesars atlantic city' are 'parking, hotels'. But the correct facets are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
-#         two_shot = """The predicted facets for 'vista, ca' are 'parking, hotels'. But the correct facets are 'weather, zip code, population, homes for sale'\n\n"""
-#         prompt = one_shot + two_shot + f"""As in the example above, modify the predicted facets.\nThe predicted facets for '{query}' are '{pred_facets}'. What are the correct facets?\n\n### Response:\nThe correct facets for '{query}' are"""    
-#     else: # unseen
-#         one_shot = """### Instruction:\nThe facets for 'caesars atlantic city' are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
-#         two_shot = """The facets for 'vista, ca' are 'weather, zip code, population, homes for sale'\n\n"""
-#         prompt = one_shot + two_shot + f"""### Response:\nThe correct facets for '{query}' are"""    
-    
-#     return prompt
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
@@ -39,14 +30,14 @@ def main():
     if method == "post": ## see small model  
         save_path = f"../../result/LLM_{model_str}_{args.trained_model}.json"
         error_path = f"../../result/LLM_{model_str}_{args.trained_model}_error.json"
-    else: ## zero (unseen)
+    else: ## zero/fewshot (unseen)
         save_path = f"../../result/LLM_{model_str}_{method}.json"
         error_path = f"../../result/LLM_{model_str}_{method}_error.json"
         
     with open(data_path, "r") as f:
         dataset = json.load(f)
 
-    model_path = f"/home/jovyan/hdfs-jmt-rungjoo-private/huggingface_models/{model_name}" # "upstage/llama-30b-instruct-2048"
+    model_path = f"/home/jovyan/hdfs-jmt-rungjoo/huggingface_models/{model_name}" # "upstage/llama-30b-instruct-2048"
     tokenizer = AutoTokenizer.from_pretrained(model_path) 
     model = AutoModelForCausalLM.from_pretrained(
         model_path,

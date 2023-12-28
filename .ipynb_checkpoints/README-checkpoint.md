@@ -75,7 +75,7 @@ cd model/multi_task
 python3 facet_generation_train.py --args
 ```
 
-# LLM post-processing
+# LLM Editing
 - input: generated facets
 - output: re-generated facets
 ```
@@ -84,10 +84,8 @@ python3 facet_generation_test.py --args
 ```
 
 # Test
-All reulsts are included in result folder
-```
-python3 test.py --model_type {type}
-```
+reulst: All results for the original test set.
+result_filter: Results for the same test set to compare with other models.
 
 # Evaluation
 For evaluation
