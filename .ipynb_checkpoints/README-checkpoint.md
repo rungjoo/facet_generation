@@ -1,4 +1,4 @@
-# Enhanced Facet Generation with LLM Editing, LREC-COLING 2024
+# Enhanced Facet Generation with LLM Editing (LREC-COLING 2024)
 ![model](./image/model.png)
 The overall flow of our model.
 
