@@ -89,6 +89,7 @@ cd model/other_models/SR_result
 
 ## Test
 reulst: All results for the original test set.
+
 result_filter: Results for the same test set to compare with other models.
 
 ## Evaluation
@@ -113,8 +114,9 @@ python3 construct_train_dataset.py
 ```
 
 ### pick information document
-Use only useful information from SERPs for learning
-Information related to queries and facets in documents
+Use only useful information from SERPs for learning.
+
+Information related to queries and facets in documents.
 ```
 cd information/pick_information
 python3 pick_document.py
