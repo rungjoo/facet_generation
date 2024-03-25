@@ -239,7 +239,7 @@ if __name__ == '__main__':
     """Parameters"""
     parser  = argparse.ArgumentParser(description = "facet generation" )
     parser.add_argument( "--model_type", type=str, help = "model", default = 'baseline')
-    parser.add_argument( "--test_type", type=str, help = "model", default = 'duplicate')
+    parser.add_argument( "--test_type", type=str, help = "model", default = 'duplicate') # unique
     parser.add_argument( "--bert_type", type=str, help = "model", default = "roberta-large")
     
     parser.add_argument('--document', action='store_true', help='train document')

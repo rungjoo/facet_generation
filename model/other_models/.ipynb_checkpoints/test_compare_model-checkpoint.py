@@ -7,7 +7,7 @@ def main():
     model_type = args.model_type
     facet_extractor = Faspect()
 
-    with open("../data/test.json", 'r', encoding='utf-8') as f:
+    with open("../../data/test.json", 'r', encoding='utf-8') as f:
         test_data = json.load(f)
 
     round_robin_result = {}    

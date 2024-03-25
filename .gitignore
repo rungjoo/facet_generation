@@ -14,4 +14,6 @@ data/*
 !data/*.ipynb
 !data/merge_test.json
 
+!model/other_models/SR_result
+
 information/LLM/LLM_train.jsonl

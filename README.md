@@ -30,17 +30,6 @@ cd data
 python3 data_preprocess.py
 ```
 
-## rationale
-Generate rationale from query and facet
-```
-cd information/LLM
-python3 generate_information7B.py
-python3 construct_train_dataset.py
-```
-
-## pick information document
-Generate document from query
-
 # Model Train
 
 ## query
@@ -83,12 +72,46 @@ cd model/LLM
 python3 facet_generation_test.py --args
 ```
 
+# Compared Models
+- (FG, SL, EFC) Revisiting Open Domain Query Facet Extraction and Generation
+```
+cd model/other_models
+python3 test_compare_model.py
+```
+- (SR) Improving search clarification with structured information extracted from search results
+```
+cd model/other_models/SR_result
+```
+
 # Test
 reulst: All results for the original test set.
 result_filter: Results for the same test set to compare with other models.
 
 # Evaluation
-For evaluation
+For auto evaluation
 ```
 python3 evaluation.py --model_type {type}
+```
+
+For LLM evaluation
+```
+python3 evaluation_LLM.py --model_type {type}
+```
+
+# Future Work
+
+## rationale
+Generate rationale from query and facet
+```
+cd information/LLM
+python3 generate_information7B.py
+python3 construct_train_dataset.py
+```
+
+## pick information document
+Use only useful information from SERPs for learning
+Information related to queries and facets in documents
+```
+cd information/pick_information
+python3 pick_document.py
 ```

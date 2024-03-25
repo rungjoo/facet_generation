@@ -10,7 +10,7 @@ def make_prompt(query, pred_facets, method):
         one_shot = """### Instruction:\nThe predicted facets for 'caesars atlantic city' are 'parking, hotels'. But the correct facets are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
         two_shot = """The predicted facets for 'vista, ca' are 'parking, hotels'. But the correct facets are 'weather, zip code, population, homes for sale'\n\n"""
         prompt = one_shot + two_shot + f"""As in the example above, modify the predicted facets.\nThe predicted facets for '{query}' are '{pred_facets}'. What are the correct facets?\n\n### Response:\nThe correct facets for '{query}' are"""
-    elif method == "zero":
+    elif method == "fewshot":
         one_shot = """### Instruction:\nThe facets for 'caesars atlantic city' are 'caesars atlantic city events, caesars atlantic city jobs, caesars atlantic city parking'\n"""
         two_shot = """The facets for 'vista, ca' are 'weather, zip code, population, homes for sale'\n\n"""
         prompt = one_shot + two_shot + f"""### Response:\nThe correct facets for '{query}' are"""    
@@ -30,7 +30,7 @@ def main():
     if method == "post": ## see small model  
         save_path = f"../../result/LLM_{model_str}_{args.trained_model}.json"
         error_path = f"../../result/LLM_{model_str}_{args.trained_model}_error.json"
-    else: ## zero/fewshot (unseen)
+    else: ## fewshot / zeroshot (unseen)
         save_path = f"../../result/LLM_{model_str}_{method}.json"
         error_path = f"../../result/LLM_{model_str}_{method}_error.json"
         
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     """Parameters"""
     parser  = argparse.ArgumentParser(description = "facet generation" )
     parser.add_argument( "--trained_model", type=str, help = "trained_model", default = "multitask_document_related")
-    parser.add_argument( "--method", type=str, help = "post or zero", default = "post") # 1e-5
+    parser.add_argument( "--method", type=str, help = "post or fewshot or noshot", default = "post") # 1e-5
     parser.add_argument( "--model_name", type=str, help = "LLM name", default = "upstage/llama-30b-instruct-2048") # 1e-5
                     
     args = parser.parse_args()

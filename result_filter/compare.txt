@@ -1,0 +1,79 @@
+#############Test Type: unique#############
+multitask_document win: 9, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1399, ERROR: 45
+
+Filter Result - options_overall_label >= 1
+multitask_document win: 9, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1390, ERROR: 45
+
+#############Test Type: unique#############
+ictir_abstractive win: 153, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 939, ERROR: 46
+
+Filter Result - options_overall_label >= 1
+ictir_abstractive win: 152, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 931, ERROR: 46
+
+#############Test Type: unique#############
+structured win: 33, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 822, ERROR: 41
+
+Filter Result - options_overall_label >= 1
+structured win: 32, LLM_upstage_llama-30b-instruct-2048_multitask_document win: 817, ERROR: 41
+
+#############Test Type: unique#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 605, multitask_document win: 761, ERROR: 910
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 601, multitask_document win: 756, ERROR: 41
+
+#############Test Type: unique#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 377, ictir_abstractive win: 771, ERROR: 1128
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 373, ictir_abstractive win: 766, ERROR: 39
+
+#############Test Type: unique#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 317, structured win: 372, ERROR: 1587
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 317, structured win: 369, ERROR: 37
+================================================================================================================================================================
+
+#############Test Type: unique#############
+#############LLM Type: gemini#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 2019, multitask_document win: 772, ERROR: 1836
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 2008, multitask_document win: 768, ERROR: 75
+
+#############Test Type: unique#############
+#############LLM Type: gemini#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1330, ictir_abstractive win: 920, ERROR: 2374
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1318, ictir_abstractive win: 914, ERROR: 71
+
+#############Test Type: unique#############
+#############LLM Type: gemini#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1159, structured win: 408, ERROR: 3035
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1149, structured win: 402, ERROR: 49
+
+#############Test Type: unique#############
+#############LLM Type: gpt4#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 2039, multitask_document win: 211, ERROR: 52
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 2027, multitask_document win: 209, ERROR: 26
+
+#############Test Type: unique#############
+#############LLM Type: gpt4#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1789, ictir_abstractive win: 486, ERROR: 2
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1777, ictir_abstractive win: 484, ERROR: 1
+
+#############Test Type: unique#############
+#############LLM Type: gpt4#############
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1450, structured win: 822, ERROR: 8
+
+Filter Result - options_overall_label >= 1
+LLM_upstage_llama-30b-instruct-2048_multitask_document win: 1442, structured win: 816, ERROR: 4
+
