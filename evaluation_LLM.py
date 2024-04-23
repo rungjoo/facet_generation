@@ -7,7 +7,7 @@ import pdb
 
 from openai import OpenAI
 import google.generativeai as genai
-GOOGLE_API_KEY="AIzaSyDjGyUmyUuktfCD_9GshOm6jBcbnAy14kM"
+GOOGLE_API_KEY="***"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 def make_prompt(query, facet_list1, facet_list2, LLM_type):
@@ -81,7 +81,7 @@ def main():
     gemini_model = genai.GenerativeModel('gemini-pro', generation_config=generation_config)    
     """ GPT4 로딩 """
     client = OpenAI(
-        api_key='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',
+        api_key='***',
     )    
         
     with open(result_path1, 'r', encoding='utf-8') as f:
